@@ -1,0 +1,6 @@
+vite.config.cts
+.eslintrc.cjs
+prettier.config.cjs
+tailwind.config.cjs
+setup-tests.ts
+dist
