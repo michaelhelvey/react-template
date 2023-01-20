@@ -1,50 +1,20 @@
-import { DndProvider, useDrag } from 'react-dnd'
+import { DndProvider } from 'react-dnd'
+import { Grid } from './components/Grid'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import clsx from 'clsx'
-
-function GridItem({ index }: { index: number }) {
-	const [{ isDragging }, drag] = useDrag(() => ({
-		type: 'GRID_ITEM',
-		collect(monitor) {
-			return {
-				isDragging: monitor.isDragging(),
-			}
-		},
-	}))
-
-	return (
-		<div
-			className={clsx(
-				'h-64 w-64 m-1 grid place-items-center',
-				isDragging
-					? 'bg-none'
-					: 'bg-blue-300 font-bold text-2xl text-white'
-			)}
-			ref={drag}
-		>
-			{isDragging ? null : index}
-		</div>
-	)
-}
-
-const ITEMS = Array.from({ length: 8 }, (_, i) => i + 1)
-
-function Grid() {
-	return (
-		<DndProvider backend={HTML5Backend}>
-			<div className="border border-gray-300 rounded shadow p-6 grid grid-flow-row grid-cols-4">
-				{ITEMS.map((num) => (
-					<GridItem key={num} index={num} />
-				))}
-			</div>
-		</DndProvider>
-	)
-}
+import { TouchBackend } from 'react-dnd-touch-backend'
 
 function App() {
+	// Question: is this a reliable way of determining which backend should be
+	// used?  React-DND doesn't have great examples on their website.
+	const isTouchDevice =
+		'ontouchstart' in window || window.navigator.maxTouchPoints
+
 	return (
-		<div className="h-full w-full grid place-items-center">
-			<Grid />
+		<div className="h-full w-full flex items-center justify-center flex-col">
+			<h1 className="my-2 text-xl">React-DND Grid Example</h1>
+			<DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
+				<Grid />
+			</DndProvider>
 		</div>
 	)
 }
