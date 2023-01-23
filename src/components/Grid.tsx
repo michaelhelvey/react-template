@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import invariant from 'tiny-invariant'
 import { arrayMoveItem } from '../utils'
 import { GridItem } from './GridItem'
@@ -42,14 +42,6 @@ export function Grid() {
 				indexOfHoverId
 			)
 
-			// While this isn't terribly efficient, it does save us one
-			// iteration.  A more efficient algorithm for calculating array
-			// "re-flow" can be easily created, I'm sure, but we're not dealing
-			// with large sets here.
-			newItems.forEach((item, i) => {
-				indexMap.current.set(item.id, i)
-			})
-
 			return newItems
 		})
 	}, [])
@@ -57,14 +49,22 @@ export function Grid() {
 	return (
 		<div className="grid place-items-center">
 			<div className="border border-gray-300 rounded shadow p-6 grid grid-flow-row grid-cols-4 transition-all">
-				{items.map((item) => (
-					<GridItem
-						key={item.id}
-						value={item.value}
-						id={item.id}
-						moveItem={moveItems}
-					/>
-				))}
+				{items.map((item, idx) => {
+					// This information is not "needed during render" I'm simply
+					// _utilizing_ the iteration that's happening _at render
+					// time_ to save a computed value.  I don't think this is
+					// what the whole "don't write to refs during render" thing
+					// is about.
+					indexMap.current.set(item.id, idx)
+					return (
+						<GridItem
+							key={item.id}
+							value={item.value}
+							id={item.id}
+							moveItem={moveItems}
+						/>
+					)
+				})}
 			</div>
 		</div>
 	)
